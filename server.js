@@ -20,27 +20,25 @@ app.get('/', pageLoad)
 
 app.post('/results', sendPlayerPackage)
 
-let accountInfo; 
+function pageLoad(request, response) {
+  console.log('Page Load')
+  response.render('pages/index.ejs')
+}
 
 async function sendPlayerPackage(request, response){
   console.log('Initialized')
   let stepOne = await getAccountInfo(request, response);
   console.log('step one complete', stepOne.body)
+  let stepTwo = await getMatches(stepOne, request, response);
+  console.log('step two complete', stepTwo.body)
 }
 
-function pageLoad(request, response) {
-  response.render('pages/index.ejs')
-}
-
-async function getAccountInfo(request, response){
+function getAccountInfo(request, response){
   let url = `https://na1.api.riotgames.com/lol/summoner/v4/summoners/by-name/${request.body.summonerName}?api_key=${process.env.RIOT_API_KEY}`
-  console.log(url)
-
   return superagent.get(url)
-    // .then(result => {
-    //   console.log('from the API', result.body)
-    // })
-    // .catch(function(err){
-    //   console.log(`Something went wrong in the Account Info API call`)
-    // })
-  }
+}
+
+function getMatches(stepOne, request, response){
+  let url = `https://na1.api.riotgames.com/lol/match/v4/matchlists/by-account/${stepOne.body.accountId}?api_key=${process.env.RIOT_API_KEY}`
+  return superagent.get(url)
+}
