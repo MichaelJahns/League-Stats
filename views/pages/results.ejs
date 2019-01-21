@@ -2,7 +2,6 @@
 
 <html>
     <head>
-
     </head>
     <body>
         <header>
@@ -11,13 +10,7 @@
         <main>
             <p> Summoner Name: <%= playerPackage.summoner %> </p>
             <p> Summoner Level: <%= playerPackage.summonerLevel %> </p>
-            <% playerPackage.match.forEach(match => { %>
-                <div> 
-                    <p> <%= match.champion %> </p>
-                    <p> <%= match.role %> </p>
-                    <p> <%= match.lane %> </p>
-                </div>
-            <% }) %>
+            <p> Encrypted ID: <%= playerPackage.summonerID %></p>
 
             <form action='/' method=GET> 
                 <button type='submit'> Take me Back </button>
