@@ -1,5 +1,6 @@
 'use strict';
 
+// const pg = require('pg');
 const cors = require(`cors`);
 const express = require(`express`);
 const superagent = require(`superagent`)
@@ -12,6 +13,10 @@ const PORT = 4000;
 app.use(express.urlencoded({extended:true}));
 app.use(express.static('public'));
 app.use(cors());
+
+// const client = new pg.Client(process.env.DATABASE_URL);
+// client.connect();
+// client.on('error', err => console.error(err));
 
 app.set('view engine', 'ejs');
 app.listen(PORT, () => console.log(`Listening on Port ${PORT}`));
