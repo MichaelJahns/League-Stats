@@ -13,9 +13,9 @@ The general flow of the project was supposed to look like this
 
 User inputs the Summoner Name they want stats for into form field
 
-Send that summoner name to Riot SummonerV4 /lol/summoner/v4/summoners/by-name/{summonerName} route, return account      info, notably the account and summoner ID, for use in future calls.
+Send that summoner name to Riot SummonerV4 /lol/summoner/v4/summoners/by-name/{summonerName} route, return account info, notably the account and summoner ID, for use in future calls.
 
-Send account ID to Riot MatchV4 /lol/match/v4/matchlists/by-account/{encryptedAccountId} route, return a package        that includes the match ID's for that summoners last 100 games. 
+Send account ID to Riot MatchV4 /lol/match/v4/matchlists/by-account/{encryptedAccountId} route, return a package that includes the match ID's for that summoners last 100 games. 
 
 For every Match ID in package
     Send a Match ID to Riot MatchV4 /lol/match/v4/matches/{matchId} route, return a package with that specific matches stats
