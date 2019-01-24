@@ -1,3 +1,7 @@
+[The title of your Project] isn’t endorsed by Riot Games and doesn’t reflect the views or opinions of Riot Games
+or anyone officially involved in producing or managing League of Legends. League of Legends and Riot Games are
+trademarks or registered trademarks of Riot Games, Inc. League of Legends © Riot Games, Inc.
+
 # League-Stats
 Teaching myself Statistics and probability with League of Legends Sats
 
@@ -28,3 +32,6 @@ Unfortunately, the riot API allows for 20 API requests a second or 100 every two
 For the above infrastructure I am attempting to make 102.
 
 A possible solution is only going through 90 or so of the matches, so that a total of 92 API requests are needed. However I do not believe that will circumnavigate the issue at hand, because when the script gets to sending the match IDs, its still going to be sending 90ish requests nearly all at once. When I am limited to 20 per second.
+
+1-22-19
+A database is a one potential solution, if i cant send 102 requests at a time, I can at least save 20 request to a db, and not request those same match IDs again. I will attempt to integrate mlab as off machine db

@@ -1,5 +1,6 @@
 'use strict';
 
+const pg = require('pg');
 const cors = require(`cors`);
 const express = require(`express`);
 const superagent = require(`superagent`)
@@ -7,14 +8,19 @@ const superagent = require(`superagent`)
 require(`dotenv`).config();
 
 const app = express();
-const PORT = 4000;
+const PORT = process.env.PORT || 3000;
 
 app.use(express.urlencoded({extended:true}));
 app.use(express.static('public'));
 app.use(cors());
 
-app.set('view engine', 'ejs');
+const client = new pg.Client(process.env.DATABASE_URL);
+client.connect();
+client.on('error', err => console.error(err));
+
 app.listen(PORT, () => console.log(`Listening on Port ${PORT}`));
+
+app.set('view engine', 'ejs');
 
 app.get('/', pageLoad)
 
@@ -25,7 +31,6 @@ function pageLoad(request, response) {
   response.render('pages/index.ejs')
 }
 
-//single block to handle all the requests made
 async function sendPlayerPackage(request, response){
   console.log(`Step 1 Initialized: Petitioning Riot for Account Info for ${request.body.summonerName}`)
   let accountDemo = await getAccountInfo(request, response);
@@ -39,7 +44,7 @@ async function sendPlayerPackage(request, response){
 
   await getMatchInfo(accountMatches, request.body.summonerName)
   var playerPackage = new PlayerPackage(accountDemo.body, accountMatches.body)
-  // console.log('step three complete', playerPackage.match)
+  // console.log('Step 3 Complete', playerPackage.match)
   response.render('pages/results', {playerPackage})
 }
 
@@ -64,9 +69,10 @@ this.match = matchHistory.matches;
 //   let url = `http://ddragon.leagueoflegends.com/cdn/6.24.1/data/en_US/champion.json`
 //   return superagent.get(url)
 // }
-//Sends user inputted Summoner Name to return their encrypted ID for use in next API
+//RIOT SummonerV4 call, returns account demographic information
 function getAccountInfo(request, response){
   let url = `https://na1.api.riotgames.com/lol/summoner/v4/summoners/by-name/${request.body.summonerName}?api_key=${process.env.RIOT_API_KEY}`
+  console.log(url)
   return superagent.get(url)
 }
 //Sends encrypted ID to return a list of the last 100 matches played by that summoner
@@ -76,22 +82,36 @@ function getMatches(accountDemo, request, response){
 }
 //Block to run all 100 matches through a fourth API that will return 100 sets of game stats
 function getMatchInfo(matchHistory, name){
-  matchHistory.body.matches.forEach((value, index) => {
-    // console.log(value.gameId)
+  asyncForEach(matchHistory.body.matches, async (value, index) => {
+    //Throttles API calls to prevent hitting the API call limit
+    if( index !== 0 && index % 10 === 0){await sleep(2000)}
     let url = `https://na1.api.riotgames.com/lol/match/v4/matches/${value.gameId}?api_key=${process.env.RIOT_API_KEY}`
     return superagent.get(url)
     .then(results => {
       var participantId = findParticipantId(results, name)
-      // console.log(participantId)
-    })
   })
-
+})
 }
+
 
 function findParticipantId(matches, name){
   matches.body.participantIdentities.forEach((val) => {
     if(val.player.summonerName === name){
-      console.log(`The particpantID of the summoenr ${input} is`)
+      console.log(`${name}'s participantID is val.player`)
     }
   })
+}
+
+
+
+//Helper Fxns
+function sleep(ms){
+  console.log('Giving Riot a chance to keep up..')
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function asyncForEach(array, callback){
+  for (let index = 0; index < array.length; index++) {
+    await callback(array[index], index, array);
+  }
 }
