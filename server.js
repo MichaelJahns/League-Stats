@@ -88,16 +88,18 @@ function getMatchInfo(matchHistory, name){
     let url = `https://na1.api.riotgames.com/lol/match/v4/matches/${value.gameId}?api_key=${process.env.RIOT_API_KEY}`
     return superagent.get(url)
     .then(results => {
-      var participantId = findParticipantId(results, name)
+      findParticipantId(results, name)
   })
 })
 }
 
-
+//Every game has ten participants decided in a random order, to find the players relavent stats, i need to suss out which one belongs to the inputted name
 function findParticipantId(matches, name){
   matches.body.participantIdentities.forEach((val) => {
     if(val.player.summonerName === name){
-      console.log(`${name}'s participantID is val.player`)
+      console.log(`${name}'s participant id is ${val.participantId}`)
+      var partID = val.participantId;
+      // returns dont work in forEach loops. Gotsa get participant Id out of this function and into somewhere that can use it
     }
   })
 }
@@ -105,6 +107,7 @@ function findParticipantId(matches, name){
 
 
 //Helper Fxns
+//===========
 function sleep(ms){
   console.log('Giving Riot a chance to keep up..')
   return new Promise(resolve => setTimeout(resolve, ms));
